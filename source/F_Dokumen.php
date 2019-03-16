@@ -176,14 +176,12 @@ class F_Dokumen extends Library {
         $this->app->get($this->pattern, function(Request $request, Response $response) {
             $dataParsed = $request->getParsedBody();
             $tanggal=date('Y-m-d');
-            // $Fetch = $this->qb
-            //               ->table($this->view)
-            //               ->where('idDepartemen', $dataParsed['idDepartemen'])
-            //               ->get();
             $Query = "Select * from vw_mstdokumen where NOW() BETWEEN (tgl_habis_berlakuDokumen - INTERVAL(900) day) AND tgl_habis_berlakuDokumen and idPerusahaan in (select idPerusahaan from tbl_utlperusahaanakses where idGrup=$dataParsed[idGrup])  and tgl_habis_berlakuDokumen is not null";
             $Fetch = $this->db->query($Query)->fetchAll(PDO::FETCH_OBJ);
-            if ($Fetch) {
-                return $response->withJson($Fetch, 200);
+            if (!empty($Fetch)) {
+                return $response->withJson(['status' => 'success', 'data' => $Fetch], 200);
+            } else if (empty($Fetch)) {
+                return $response->withJson(["status" => "empty"], 200);
             } else {
                 return $response->withJson(["status" => "failed"], 500);
             }
