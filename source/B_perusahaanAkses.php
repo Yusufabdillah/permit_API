@@ -70,6 +70,19 @@ class B_perusahaanAkses extends Library {
         // ->add(parent::middleware());
     }
 
+    private function getDataSite() {
+        $this->app->get($this->pattern, function(Request $request, Response $response, $args) {
+            $dataParsed = $request->getParsedBody();
+            $Query = "CALL sp_utlperusahaanakses('getDataSite', 'idGrup', $dataParsed[idGrup], NULL, $dataParsed[idKecamatan]);";
+            $Fetch = $this->db->query($Query)->fetchAll(PDO::FETCH_OBJ);
+            if ($Fetch) {
+                return $response->withJson($Fetch, 200);
+            } else {
+                return $response->withJson(["status" => "failed"], 200);
+            }
+        });
+    }
+
     protected function getView() {
         $this->app->get($this->pattern.'/{VALUE_DATA}[/{KOLOM}]', function(Request $request, Response $response, $args) {
             $value_data = $args['VALUE_DATA'];
